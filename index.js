@@ -1,4 +1,20 @@
 
+var mood;
+var satiety;
+var energy;
+
+var chargingMood = false;
+var chargingSatiety = false;
+var chargingEnergy = false;
+
+var moodMask;
+var satietyMask;
+var energyMask;
+
+var dataAboutPast = getPiggyState();
+var svgPicture;
+
+
 function getPiggyState() {
     var dataAboutPast = localStorage.getItem('piggyState');
     if (dataAboutPast === null) {
@@ -80,11 +96,15 @@ function repaintMouth(mouth, number) {
             return;
         case 1:
             mouth.animate({
-                d: 'M215.37897964858962,236.0228187595313 Q181.212236658258,' +
-                '231.9908671163634 195.55334596400087,255.84845244412017'
-            }, 5);
+                d: 'M215.37897964858962,236.0228187595313 Q191.27289242290823,234.865340191979 ' +
+                '195.55334596400087,255.84845244412017 '
+            }, 10);
             return;
         default:
+            mouth.animate({
+                d: 'M215.37897964858962,236.0228187595313 Q191.27289242290823,234.865340191979 ' +
+                '195.55334596400087,255.84845244412017 '
+            }, 10);
             return;
     }
 }
@@ -127,60 +147,107 @@ function setBlink(eye) {
     }, 10000);
 }
 
-//получаем состоянии свинюшки
+function setSpeechRecognizer() {
+    var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition || null;
+    if (SpeechRecognition === null) {
+        console.error('Речь не распознается');
+        return;
+    }
+    var recognizer = new SpeechRecognition();
+    recognizer.lang = 'ru-RU';
+    recognizer.onresult = function (event) {
+        recognizer.stop();
+        console.log(event.results[0][0].transcript);
+    };
 
-$(document).ready(function () {
-    var mood;
-    var satiety;
-    var energy;
+    $('.piggy').on('click', function () {
+        recognizer.start();
+    });
+}
 
-    var chargingMood = false;
-    var chargingSatiety = false;
-    var chargingEnergy = false;
+function setButtonRestart() {
+    $('#restart').on('click', function (event) {
+        dataAboutPast = {
+            mood: 100,
+            satiety: 100,
+            energy: 100
+        };
 
-    var dataAboutPast = getPiggyState();
+        mood = dataAboutPast.mood;
+        satiety = dataAboutPast.satiety;
+        energy = dataAboutPast.energy;
+
+        localStorage.setItem('piggyState', JSON.stringify(dataAboutPast));
+
+        moodMask.trigger('increaseMood', [mood]);
+        satietyMask.trigger('increaseSatiety', [satiety]);
+        energyMask.trigger('increaseEnergy', [energy]);
+
+
+    });
+}
+
+function setPiggy() {
     mood = dataAboutPast.mood;
     satiety = dataAboutPast.satiety;
     energy = dataAboutPast.energy;
 
-    var svgPicture = Snap('.svg-layer_picture');
+    svgPicture = Snap('.svg-layer_picture');
 
-
-    var moodMask = $(svgPicture.select('.mood'));
-    var satietyMask = $(svgPicture.select('.satiety'));
-    var energyMask = $(svgPicture.select('.energy'));
+    moodMask = $(svgPicture.select('.mood'));
+    satietyMask = $(svgPicture.select('.satiety'));
+    energyMask = $(svgPicture.select('.energy'));
 
     var mouth = svgPicture.select('.mouth');
     moodMask.on('increaseMood', function (event, some) {
         repaint(this, some);
         repaintMouth(mouth, some);
     });
-    satietyMask.on('repaint', function (event, some) {
+    satietyMask.on('increaseSatiety', function (event, some) {
         repaint(this, some);
     });
-    energyMask.on('repaint', function (event, some) {
+    energyMask.on('increaseEnergy', function (event, some) {
         repaint(this, some);
     });
 
     moodMask.trigger('increaseMood', [mood]);
-    satietyMask.trigger('repaint', [satiety]);
-    energyMask.trigger('repaint', [energy]);
+    satietyMask.trigger('increaseSatiety', [satiety]);
+    energyMask.trigger('increaseEnergy', [energy]);
 
     setInterval(function () {
         mood = ((!chargingMood) && (mood > 0))? mood - 1 : 0;
         satiety = (!chargingSatiety && satiety > 0)? satiety - 1 : 0;
         energy = (!chargingEnergy && energy > 0)? energy - 1 : 0;
 
+        dataAboutPast = {
+            mood: mood,
+            satiety: satiety,
+            energy: energy
+        };
+
+        localStorage.setItem('piggyState', JSON.stringify(dataAboutPast));
+
         moodMask.trigger('increaseMood', [mood]);
-        satietyMask.trigger('repaint', [satiety]);
-        energyMask.trigger('repaint', [energy]);
+        satietyMask.trigger('increaseSatiety', [satiety]);
+        energyMask.trigger('increaseEnergy', [energy]);
 
         if ((mood == 0 && satiety == 0) || (energy == 0 && satiety == 0) || (mood == 0 && energy == 0)) {
             console.log('die');
         }
 
     }, 10000);
+};
+
+
+//получаем состоянии свинюшки
+
+$(document).ready(function () {
+    setPiggy();
 
     var eyes = svgPicture.selectAll('.eyelide');
     setBlink(eyes);
+
+    setSpeechRecognizer();
+
+    setButtonRestart();
 });
