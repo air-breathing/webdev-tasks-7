@@ -1,0 +1,12 @@
+body {
+    margin: 0;
+
+    background-color: #D6EDEE;
+}
+.page {
+    position: relative;
+}
+.svg-layer {
+    margin: auto;
+    width: 100%;
+}
