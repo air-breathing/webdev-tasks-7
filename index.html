@@ -3,8 +3,10 @@
 <head>
     <link rel="stylesheet" href="index.css">
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Piggy</title>
     <script src="snap.svg-min.js"></script>
+    <script src="https://code.jquery.com/jquery-2.2.3.min.js"
+            integrity="sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo=" crossorigin="anonymous"></script>
 </head>
 <body>
 <div class="page">
@@ -15,17 +17,22 @@
             <defs>
                 <linearGradient x1="0.718739970288027" y1="-2.1474349245779933"
                                 x2="0.718739970288027" y2="405.1394178553481"
-                                id="_1461421577862_0_" gradientUnits="userSpaceOnUse"
+                                id="sky-gradient" gradientUnits="userSpaceOnUse"
                                 gradientTransform="matrix(1 0 0 1 0 0)">
                     <stop offset="0" style="stop-color:rgb(35, 41, 116)"> </stop>
                     <stop offset="1" style="stop-color:rgb(136, 211, 240)"> </stop>
+                </linearGradient>
+                <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" style="stop-color:rgb(253, 0, 0);stop-opacity:1"> </stop>
+                    <stop offset="25%" style="stop-color:rgb(234, 243, 10);stop-opacity: 1"> </stop>
+                    <stop offset="100%" style="stop-color:rgb(0, 255, 20);stop-opacity:1"> </stop>
                 </linearGradient>
             </defs>
             <g type="LAYER" name="workspace" id="workspace" locked="true"> </g>
             <g id="Layer 01" type="LAYER" name="Layer 01">
                 <path class="sky" transform="matrix(1 0 0 1 5.684341886080802e-14 -2.2737367544323206e-13)"
                       width="846.3080814478526" height="407.2868527799261"
-                      stroke-miterlimit="0" stroke="#000000" fill="url(#_1461421577862_0_)"
+                      stroke-miterlimit="0" stroke="#000000" fill="url(#sky-gradient)"
                       d="M0.718739970288027,0.8483458947064264
 L847.0268214181407,-2.1474349245779933 L844.0310405988563,405.1394178553481
 L2.216630379930166,393.29563322096766 L0.7187399702881407,0.8483458947064264 "> </path>
@@ -37,6 +44,20 @@ L393.1660272965487,776.8217134857975 L533.9677258029171,774.3755421962078
 L647.8073969357258,774.3755421962078 L844.0310405988562,776.8217134857975
 L844.0310405988562,974.9615879425735 L3.7145207895723757,974.9615879425735
 L2.2166303799300664,764.5908570378484 "></path>
+                <mask id="line-mask">
+                    <g fill="white">
+                        <rect class="mood" x="540" y="30" width="260" height="20"></rect>
+                        <rect class="satiety" x="540" y="65" width="260" height="20"></rect>
+                        <rect class="energy" x="540" y="100" width="260" height="20"></rect>
+                    </g>
+                </mask>
+                <rect x="420" y="10" width="400" height="130" fill="black"></rect>
+                <rect mask="url(#line-mask)" x="520" y="20" width="300" height="100" fill="url(#grad1)"></rect>
+                <text x="540" y="25" fill="white">0</text>
+                <text x="775" y="25" fill="white">100</text>
+                <text x="440" y="45" fill="white">Настроение</text>
+                <text x="440" y="80" fill="white">Сытость</text>
+                <text x="440" y="115" fill="white">Энергия</text>
                 <!--<path id="" stroke-width="2.8941430216537753" stroke-miterlimit="3" stroke="#C15D78"
                       fill="#FFC7D8" d="M333.3682678311498,207.41703056768557 "></path>
                 <path transform="matrix(1 0 0 1 280.52034746938176 271.8977749506921)" stroke-width="0"
