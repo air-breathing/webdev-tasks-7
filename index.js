@@ -21,6 +21,112 @@ function repaint(rect, number) {
     });
 }
 
+function repaintMouth(mouth, number) {
+    var result = (number - number % 10) / 10;
+    switch (result) {
+        case 10:
+            mouth.animate({
+                d: 'M215.37897964858968,236.0228187595312 Q220.09936862111095,' +
+                '268.12146377267516 195.5533459640008,255.8484524441201 '
+            }, 5);
+            return;
+        case 9:
+            mouth.animate({
+               d: 'M215.37897964858962,236.0228187595313 Q215.28000194997497,261.09817911418577' +
+               ' 195.55334596400087,255.84845244412017 '
+            }, 10);
+            return;
+        case 8:
+            mouth.animate({
+                d: 'M215.37897964858962,236.0228187595313 Q209.83027111517853,258.4553438979681' +
+                ' 195.55334596400087,255.84845244412017 '
+            }, 10);
+            return;
+        case 7:
+            mouth.animate({
+                d: 'M215.37897964858962,236.0228187595313 Q206.15124209386002,253.9694617995502 ' +
+                '195.55334596400087,255.84845244412017 '
+            }, 10);
+            return;
+        case 6:
+            mouth.animate({
+                d: 'M215.37897964858962,236.0228187595313 Q204.26875874480135,251.3131916976098 ' +
+                '195.55334596400087,255.84845244412017 '
+            }, 10);
+            return;
+        case 5:
+            mouth.animate({
+                d: 'M215.37897964858962,236.0228187595313 Q199.89631164975177,244.20737768772364' +
+                ' 195.55334596400087,255.84845244412017 '
+            }, 10);
+            return;
+        case 4:
+            mouth.animate({
+                d: 'M215.37897964858962,236.0228187595313 Q197.7404568430413,242.77014114991636' +
+                ' 195.55334596400087,255.84845244412017 '
+            }, 10);
+            return;
+        case 3:
+            mouth.animate({
+                d: 'M215.37897964858962,236.0228187595313 Q195.94391117078203,239.89566807430185' +
+                ' 195.55334596400087,255.84845244412017 '
+            }, 10);
+            return;
+        case 2:
+            mouth.animate({
+                d: 'M215.37897964858962,236.0228187595313 Q191.27289242290823,234.865340191979 ' +
+                '195.55334596400087,255.84845244412017 '
+            }, 10);
+            return;
+        case 1:
+            mouth.animate({
+                d: 'M215.37897964858962,236.0228187595313 Q181.212236658258,' +
+                '231.9908671163634 195.55334596400087,255.84845244412017'
+            }, 5);
+            return;
+        default:
+            return;
+    }
+}
+
+function setBlink(eye) {
+    $(eye[0]).on('closeEye', function () {
+        this.animate({
+            opacity: 1
+        }, 100, function () {
+            $(this).trigger('openEye');
+        });
+    });
+
+    $(eye[1]).on('closeEye', function () {
+        this.animate({
+            opacity: 1
+        }, 100, function () {
+            $(this).trigger('openEye');
+        });
+    });
+
+    $(eye[0]).on('openEye', function () {
+        this.animate({
+            opacity: 0
+        }, 100);
+    });
+
+    $(eye[1]).on('openEye', function () {
+        this.animate({
+            opacity: 0
+        }, 100);
+    });
+
+    $(eye[0]).trigger('closeEye');
+    $(eye[1]).trigger('closeEye');
+
+    setInterval(function () {
+        $(eye[0]).trigger('closeEye');
+        $(eye[1]).trigger('closeEye');
+    }, 10000);
+}
+
 //получаем состоянии свинюшки
 
 $(document).ready(function () {
@@ -39,13 +145,15 @@ $(document).ready(function () {
 
     var svgPicture = Snap('.svg-layer_picture');
 
-    var lines = $('#line-mask');
+
     var moodMask = $(svgPicture.select('.mood'));
     var satietyMask = $(svgPicture.select('.satiety'));
     var energyMask = $(svgPicture.select('.energy'));
 
-    moodMask.on('repaint', function (event, some) {
+    var mouth = svgPicture.select('.mouth');
+    moodMask.on('increaseMood', function (event, some) {
         repaint(this, some);
+        repaintMouth(mouth, some);
     });
     satietyMask.on('repaint', function (event, some) {
         repaint(this, some);
@@ -54,7 +162,7 @@ $(document).ready(function () {
         repaint(this, some);
     });
 
-    moodMask.trigger('repaint', [mood]);
+    moodMask.trigger('increaseMood', [mood]);
     satietyMask.trigger('repaint', [satiety]);
     energyMask.trigger('repaint', [energy]);
 
@@ -63,7 +171,7 @@ $(document).ready(function () {
         satiety = (!chargingSatiety && satiety > 0)? satiety - 1 : 0;
         energy = (!chargingEnergy && energy > 0)? energy - 1 : 0;
 
-        moodMask.trigger('repaint', [mood]);
+        moodMask.trigger('increaseMood', [mood]);
         satietyMask.trigger('repaint', [satiety]);
         energyMask.trigger('repaint', [energy]);
 
@@ -73,15 +181,6 @@ $(document).ready(function () {
 
     }, 10000);
 
-
-
-    var mouth = svgPicture.select('.mouth');
-    $(mouth).on('closeMouth', function () {
-        this.animate({
-            d: 'M215.37897964858962,236.0228187595313 Q204.26875874480135,' +
-            '251.3131916976098 195.55334596400087,255.84845244412017 '
-        }, 1000);
-    });
-
-    $(mouth).trigger('closeMouth');
+    var eyes = svgPicture.selectAll('.eyelide');
+    setBlink(eyes);
 });
