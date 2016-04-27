@@ -1,18 +1,33 @@
 
-var mood;
-var satiety;
-var energy;
+require('./blink.js');
+require('./mood.js');
+require('./energy.js');
+require('./satiety.js');
 
-var chargingMood = false;
-var chargingSatiety = false;
-var chargingEnergy = false;
+//mood;
+//satiety;
+//energy;
+
+// ожидается, что данные флаги лежат в глобальном объекте, это важно!
+chargingMood = false;
+chargingSatiety = false;
+chargingEnergy = false;
 
 var moodMask;
 var satietyMask;
 var energyMask;
 
 var dataAboutPast = getPiggyState();
-var svgPicture;
+//var svgPicture;
+
+actions = {
+    'nothing': 0,
+    'communicate': 1,
+    'eat': 2,
+    'sleep': 3
+};
+
+action = actions['nothing'];
 
 
 function getPiggyState() {
@@ -109,61 +124,7 @@ function repaintMouth(mouth, number) {
     }
 }
 
-function setBlink(eye) {
-    $(eye[0]).on('closeEye', function () {
-        this.animate({
-            opacity: 1
-        }, 100, function () {
-            $(this).trigger('openEye');
-        });
-    });
 
-    $(eye[1]).on('closeEye', function () {
-        this.animate({
-            opacity: 1
-        }, 100, function () {
-            $(this).trigger('openEye');
-        });
-    });
-
-    $(eye[0]).on('openEye', function () {
-        this.animate({
-            opacity: 0
-        }, 100);
-    });
-
-    $(eye[1]).on('openEye', function () {
-        this.animate({
-            opacity: 0
-        }, 100);
-    });
-
-    $(eye[0]).trigger('closeEye');
-    $(eye[1]).trigger('closeEye');
-
-    setInterval(function () {
-        $(eye[0]).trigger('closeEye');
-        $(eye[1]).trigger('closeEye');
-    }, 10000);
-}
-
-function setSpeechRecognizer() {
-    var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition || null;
-    if (SpeechRecognition === null) {
-        console.error('Речь не распознается');
-        return;
-    }
-    var recognizer = new SpeechRecognition();
-    recognizer.lang = 'ru-RU';
-    recognizer.onresult = function (event) {
-        recognizer.stop();
-        console.log(event.results[0][0].transcript);
-    };
-
-    $('.piggy').on('click', function () {
-        recognizer.start();
-    });
-}
 
 function setButtonRestart() {
     $('#restart').on('click', function (event) {
@@ -182,8 +143,6 @@ function setButtonRestart() {
         moodMask.trigger('increaseMood', [mood]);
         satietyMask.trigger('increaseSatiety', [satiety]);
         energyMask.trigger('increaseEnergy', [energy]);
-
-
     });
 }
 
@@ -215,9 +174,9 @@ function setPiggy() {
     energyMask.trigger('increaseEnergy', [energy]);
 
     setInterval(function () {
-        mood = ((!chargingMood) && (mood > 0))? mood - 1 : 0;
-        satiety = (!chargingSatiety && satiety > 0)? satiety - 1 : 0;
-        energy = (!chargingEnergy && energy > 0)? energy - 1 : 0;
+        mood = ((!chargingMood) && (mood > 0))? mood - 1 : mood;
+        satiety = (!chargingSatiety && satiety > 0)? satiety - 1 : satiety;
+        energy = (!chargingEnergy && energy > 0)? energy - 1 : energy;
 
         dataAboutPast = {
             mood: mood,
@@ -235,7 +194,7 @@ function setPiggy() {
             console.log('die');
         }
 
-    }, 10000);
+    }, 9000);
 };
 
 
@@ -245,7 +204,10 @@ $(document).ready(function () {
     setPiggy();
 
     var eyes = svgPicture.selectAll('.eyelide');
+
     setBlink(eyes);
+
+    setDreaming();
 
     setSpeechRecognizer();
 

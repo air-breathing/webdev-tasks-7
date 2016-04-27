@@ -25,7 +25,7 @@ module.exports = {
                 test: /\.css/,
                 loader: ExtractTextPlagin.extract('style-loader', 'css-loader')
             }, {
-                test: /\.png$|\.ico$/,
+                test: /\.png$|\.ico$|\.svg$/,
                 loader: 'file-loader'
             }
         ]
