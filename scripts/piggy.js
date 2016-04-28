@@ -17,6 +17,8 @@ var moodMask;
 var satietyMask;
 var energyMask;
 
+svgPicture = null;
+
 var dataAboutPast = getPiggyState();
 //var svgPicture;
 
@@ -158,9 +160,15 @@ function setPiggy() {
     energyMask = $(svgPicture.select('.energy'));
 
     var mouth = svgPicture.select('.mouth');
-    moodMask.on('increaseMood', function (event, some) {
-        repaint(this, some);
-        repaintMouth(mouth, some);
+    moodMask.on('increaseMood', function (event, number) {
+        repaint(this, number);
+        //при сне - отсутвствие улыбки или грусти
+        if (chargingEnergy) {
+            repaintMouth(mouth, 60);
+        } else {
+            repaintMouth(mouth, number);
+        }
+
     });
     satietyMask.on('increaseSatiety', function (event, some) {
         repaint(this, some);
@@ -203,9 +211,7 @@ function setPiggy() {
 $(document).ready(function () {
     setPiggy();
 
-    var eyes = svgPicture.selectAll('.eyelide');
-
-    setBlink(eyes);
+    setBlink();
 
     setDreaming();
 

@@ -1,15 +1,47 @@
 
 (function () {
     global.setDreaming = function (){
-        console.log('asdsdsd');
-        setGradient(1000);
+        var hidden           = null;
+        var visibilityState  = null;
+        var visibilityChange = null;
+        if ('hidden' in document) {
+            hidden           = 'hidden';
+            visibilityState  = 'visibilityState';
+            visibilityChange = 'visibilitychange';
+        } else if ('mozHidden' in document) {
+            hidden           = 'mozHidden';
+            visibilityState  = 'mozVisibilityState';
+            visibilityChange = 'mozvisibilitychange';
+        } else if ('webkitHidden' in document) {
+            hidden           = 'webkitHidden';
+            visibilityState  = 'webkitVisibilityState';
+            visibilityChange = 'webkitvisibilitychange';
+        } else {
+            console.log('Не поддерживается Page Visibility');
+            return;
+        }
+        idInterval2 = undefined;
+        $(document).on(visibilityChange, function () {
+            if (document[hidden]) {
+                //анимированное засыпание
+                fallAsleep();
+            } else {
+                //анимированное пробуждение
+                wakeUp();
+            }
+        });
+
+        //setGradient(1000);
         if ('ondevicelight' in window) {
             $(window).on('devicelight', function (event) {
-                console.log('wwwwwww');
-                if (event.value == undefined) {
-                    value = 10000
+                var value = event.value || 10000;
+                if (value < 10000 && energy < 100) {
+                    fallAsleep();
+                } else {
+                    wakeUp();
                 }
-                setGradient(event.value)})
+                //setGradient(value)})
+            })
         } else {
             console.log('распознавание света не поддерживатся браузером')
         }
@@ -44,4 +76,28 @@ function setGradient(value) {
     svgPicture.select('#sky-bottom').animate({
         style: 'stop-color:' +  bottom
     }, 100)
+}
+
+function fallAsleep() {
+    chargingEnergy = true;
+    idInterval2 = setInterval(function () {
+        energy = (energy < 100)? energy + 1: energy;
+    }, 1000);
+    var eyes = svgPicture.selectAll('.eyelide');
+    clearInterval(idIntervalBlink);
+    console.log('sleep');
+    $(eyes[0]).trigger('closeEye');
+    $(eyes[1]).trigger('closeEye');
+}
+
+function wakeUp() {
+    clearInterval(idInterval2);
+    chargingEnergy = false;
+    var eyes = svgPicture.selectAll('.eyelide');
+    setTimeout(function () {
+        $(eyes[0]).trigger('openEye');
+        $(eyes[1]).trigger('openEye');
+    }, 90000);
+    idIntervalBlink = setInterval(blinkFunciton, 10000);
+    console.log('wake up');
 }
