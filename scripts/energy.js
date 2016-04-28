@@ -20,6 +20,9 @@
             console.log('Не поддерживается Page Visibility');
             return;
         }
+        //var normalGradient = 'l(0, 0, 1, 1)#88d3f0-#232974';
+
+
         idInterval2 = undefined;
         $(document).on(visibilityChange, function () {
             if (document[hidden]) {
@@ -31,16 +34,27 @@
             }
         });
 
+        $('#darkness').on('click', function () {
+            setGradient(40);
+        });
+
+        $('#dark').on('click', function () {
+            setGradient(1500);
+        });
+
+        $('#normal').on('click', function () {
+            setGradient(9000);
+        });
+
+        $('#light').on('click', function () {
+            setGradient(10000);
+        });
+
         //setGradient(1000);
         if ('ondevicelight' in window) {
             $(window).on('devicelight', function (event) {
                 var value = event.value || 10000;
-                if (value < 10000 && energy < 100) {
-                    fallAsleep();
-                } else {
-                    wakeUp();
-                }
-                //setGradient(value)})
+                setGradient(value)
             })
         } else {
             console.log('распознавание света не поддерживатся браузером')
@@ -49,33 +63,55 @@
 })();
 
 function setGradient(value) {
-    var bottom;
-    var high;
-    if (value < 50) {
-        bottom = 'rgb(12, 14, 39)';//#0c0e27
-        high = 'rgb(7, 87, 100)';//#075764
+    if (value < 10000 && energy < 100) {
+        fallAsleep();
     } else {
-        if (value < 2000){
-            bottom = 'rgb(20, 24, 67)';//#141843
-            high = 'rgb(11, 140, 161)';//#0b8ca1
-        } else {
-            if (value < 10000) {
-                high = 'rgb(136, 211, 240)';//#88d3f0
-                bottom = 'rgb(35, 41, 116)';//#232974
-            } else {
-                high = 'rgb(136, 211, 240)';//#88d3f0
-                bottom = 'rgb(42, 193, 240)';//#2ac1f0
-            }
-        }
+        wakeUp();
+    }
+    var gradient = svgPicture.select('#sky-gradient');
+    var darknessGradient = 'l(0, 0, 0, 1)#0c0e27-#075764';
+
+    var darkGradient = 'l(0, 0, 0, 1)#141843-#0b8ca1';
+
+    var normalGradient = 'l(0, 0, 0, 1)#232974-#88d3f0';
+
+    var lightGradient = 'l(0, 0, 0, 1)#88d3f0-#2ac1f0';
+
+    if (value < 50) {
+        gradient.animate({
+            x1: 0,
+            y1: 0,
+            x2: 0,
+            y2: 1000
+        }, 10000)
     }
 
-    svgPicture.select('#sky-high').animate({
-        style: 'stop-color:' +  high
-    }, 100);
+    if (value >= 50 && value < 2000) {
+        gradient.animate({
+            x1: 0,
+            y1: -100,
+            x2: 0,
+            y2: 600
+        }, 10000)
+    }
 
-    svgPicture.select('#sky-bottom').animate({
-        style: 'stop-color:' +  bottom
-    }, 100)
+    if (value >= 2000 && value < 10000) {
+        gradient.animate({
+            x1: 0,
+            y1: -300,
+            x2: 0,
+            y2: 450
+        }, 10000)
+    }
+
+    if (value >= 10000) {
+        gradient.animate({
+            x1: 0,
+            y1: -450,
+            x2: 0,
+            y2: 0
+        }, 10000)
+    }
 }
 
 function fallAsleep() {
@@ -94,10 +130,10 @@ function wakeUp() {
     clearInterval(idInterval2);
     chargingEnergy = false;
     var eyes = svgPicture.selectAll('.eyelide');
+    idIntervalBlink = setInterval(blinkFunciton, 10000);
     setTimeout(function () {
         $(eyes[0]).trigger('openEye');
         $(eyes[1]).trigger('openEye');
     }, 90000);
-    idIntervalBlink = setInterval(blinkFunciton, 10000);
     console.log('wake up');
 }
