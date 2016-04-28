@@ -80,11 +80,11 @@ function setGradient(value) {
 
 function fallAsleep() {
     chargingEnergy = true;
+    clearInterval(idIntervalBlink);
     idInterval2 = setInterval(function () {
         energy = (energy < 100)? energy + 1: energy;
     }, 1000);
     var eyes = svgPicture.selectAll('.eyelide');
-    clearInterval(idIntervalBlink);
     console.log('sleep');
     $(eyes[0]).trigger('closeEye');
     $(eyes[1]).trigger('closeEye');
