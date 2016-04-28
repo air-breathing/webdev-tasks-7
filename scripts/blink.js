@@ -2,20 +2,18 @@
 (function () {
     global.setBlink = function () {
         var eye = svgPicture.selectAll('.eyelide');
-        $(eye[0]).on('closeEye', function () {
+        $(eye[0]).on('closeEye', function (event, callback) {
+            console.log(callback);
             this.animate({
                 opacity: 1
-            }, 100, function () {
-                $(this).trigger('openEye');
-            });
+            },100, callback);
         });
 
-        $(eye[1]).on('closeEye', function () {
+        $(eye[1]).on('closeEye', function (event, callback) {
+            console.log(callback, 'qwq');
             this.animate({
                 opacity: 1
-            }, 100, function () {
-                $(this).trigger('openEye');
-            });
+            }, 100, callback);
         });
 
         $(eye[0]).on('openEye', function () {
@@ -30,12 +28,23 @@
             }, 100);
         });
 
-        $(eye[0]).trigger('closeEye');
-        $(eye[1]).trigger('closeEye');
+        $(eye[0]).trigger('closeEye', function () {
+            $(eye[0]).trigger('openEye');
+        });
+        $(eye[1]).trigger('closeEye', function () {
+            $(eye[1]).trigger('openEye');
+        });
 
         blinkFunciton = function () {
-            $(eye[0]).trigger('closeEye');
-            $(eye[1]).trigger('closeEye');
+            var callback = function () {
+                $(this).trigger('openEye');
+            };
+            $(eye[0]).trigger('closeEye', function () {
+                $(eye[0]).trigger('openEye');
+            });
+            $(eye[1]).trigger('closeEye', function () {
+                $(eye[1]).trigger('openEye');
+            });
         };
         idIntervalBlink = setInterval(blinkFunciton, 10000);
 }})();
