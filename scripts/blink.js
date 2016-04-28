@@ -3,7 +3,7 @@
     global.setBlink = function () {
         var eye = svgPicture.selectAll('.eyelide');
         $(eye[0]).on('closeEye', function (event, callback) {
-            console.log(callback);
+            alert(callback);
             this.animate({
                 opacity: 1
             },100, callback);
@@ -36,9 +36,6 @@
         });
 
         blinkFunciton = function () {
-            var callback = function () {
-                $(this).trigger('openEye');
-            };
             $(eye[0]).trigger('closeEye', function () {
                 $(eye[0]).trigger('openEye');
             });
