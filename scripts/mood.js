@@ -40,11 +40,9 @@ function getHandler(recognizer) {
                 return;
             }
             mood = (mood < 100)? mood + 1: mood;
-            chargingMood = true;
-            if (mood === 100) {
-                chargingMood = false;
+
+            chargingMood = !(mood === 100);
                 //idInterval отключиться во время распознавания текста
-            }
         }, 1000);
         recognizer.start();
     }
