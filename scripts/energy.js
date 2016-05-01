@@ -1,5 +1,16 @@
+var sleepEventEnable;
+var sleepEventDisable;
+var eatEventDisable;
+var sleepSong;
+var eatSong;
 
 (function () {
+    sleepEventEnable = new Event('enableSong', {bubbles : true, cancelable : true});
+    sleepEventDisable = new Event('disableSong', {bubbles : true, cancelable : true});
+    eatEventDisable = new Event('disableSong', {bubbles : true, cancelable : true});
+    eatSong = document.querySelector('.eat-song');
+    sleepSong = document.querySelector('.sleep-song');
+
     global.setDreaming = function (){
         var hidden           = null;
         var visibilityState  = null;
@@ -64,7 +75,7 @@
 })();
 
 function setGradient(value) {
-    if (value < 10000 && energy < 100) {
+    if (value < 2000 && energy < 100) {
         fallAsleep();
     } else {
         wakeUp();
@@ -108,6 +119,8 @@ function setGradient(value) {
 }
 
 function fallAsleep() {
+    sleepSong.dispatchEvent(sleepEventEnable);
+    eatSong.dispatchEvent(eatEventDisable);
     chargingEnergy = true;
     blinkFlag = false;
     moodMask.trigger('changeMood', 60);
@@ -120,14 +133,12 @@ function fallAsleep() {
             wakeUp()
         }
     }, 1000);
-    console.log('sleep');
 
 }
 
 function wakeUp() {
+    sleepSong.dispatchEvent(sleepEventDisable);
     chargingEnergy = false;
     clearInterval(idInterval2);
     blinkFlag = true;
-    console.log('wake up');
-
 }

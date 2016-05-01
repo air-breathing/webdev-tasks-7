@@ -4,6 +4,7 @@ require('./mood.js');
 require('./energy.js');
 require('./satiety.js');
 require('./die.js');
+require('./audio.js');
 //mood;
 //satiety;
 //energy;
@@ -20,7 +21,6 @@ energyMask = null;
 svgPicture = null;
 
 var dataAboutPast = getPiggyState();
-
 
 function getPiggyState() {
     var dataAboutPast = localStorage.getItem('piggyState');
@@ -154,8 +154,11 @@ function setPiggy() {
         if (chargingEnergy) {
             repaintMouth(mouth, 60);
         } else {
-            repaintMouth(mouth, number);
+            if (!chargingSatiety) {
+                repaintMouth(mouth, number);
+            }
             repaint(this, number);
+
         }
 
 
@@ -213,4 +216,6 @@ $(document).ready(function () {
     setSpeechRecognizer();
 
     setButtonRestart();
+
+    setMusic();
 });

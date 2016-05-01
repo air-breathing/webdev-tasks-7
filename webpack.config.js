@@ -10,7 +10,8 @@ module.exports = {
     context: __dirname,
     entry: {
         index: './bundles/index/index.js',
-        images: './images'
+        images: './images',
+        audio: './audio'
     },
     devtool: 'source-map',
     output: {
@@ -25,7 +26,7 @@ module.exports = {
                 test: /\.css/,
                 loader: ExtractTextPlagin.extract('style-loader', 'css-loader')
             }, {
-                test: /\.png$|\.ico$|\.svg$/,
+                test: /\.png$|\.ico$|\.svg$|\.mp3$/,
                 loader: 'file-loader'
             }
         ]

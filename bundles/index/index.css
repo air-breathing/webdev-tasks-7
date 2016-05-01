@@ -27,27 +27,44 @@ body {
     width: 150px;
 }
 
-.speech {
+.features {
     width: 30%;
 }
 
-.speech__header {
-
-}
-
-.speech__text {
+.features__text {
     width: 100%;
     height: 100px;
     background-color: #fff;
     border: solid 1px black;
 }
 
+.sleep-song_hidden {
+    display: none;
+}
+
+.eat-song_hidden {
+    display: none;
+}
+
+.eat-song_visible {
+    display: block;
+}
+
+.sleep-song_visible {
+    display: block;
+}
+
+.audio-holder {
+    margin: auto;
+}
+
+
 @media screen and (max-device-width: 600px) and (max-width: 600px){
     .page {
         display: block;
     }
 
-    .speech {
+    .features {
         width: 100%;
     }
 

@@ -1,3 +1,6 @@
+var eatEventEnable;
+var eatEventDisable;
+var eatSong;
 
 function batteryHandler (battery) {
     if (battery.charging) {
@@ -8,19 +11,22 @@ function batteryHandler (battery) {
             eat(undefined, battery)
         }
     }
-};
+}
 
 function eat(event, battery) {
     if (satiety < 100 && !chargingEnergy) {
+        eatSong.dispatchEvent(eatEventEnable);
         idInterval3 = setInterval(
             function () {
                 if (chargingEnergy || (battery != undefined && battery.charging === false)) {
+                    eatSong.dispatchEvent(eatEventDisable);
                     clearInterval(idInterval3);
                     return;
                 }
                 satiety = (satiety < 100)? satiety + 1: satiety;
                 chargingSatiety = true;
                 if (satiety === 100) {
+                    eatSong.dispatchEvent(eatEventDisable);
                     chargingSatiety = false;
                     clearInterval(idInterval3);
                 }
@@ -35,6 +41,9 @@ function setButton() {
 }
 
 (function (){
+    eatEventEnable = new Event('enableSong', {bubbles : true, cancelable : true});
+    eatEventDisable = new Event('disableSong', {bubbles : true, cancelable : true});
+    eatSong = document.querySelector('.eat-song');
     global.setEating = function () {
         if (navigator.getBattery) {
             navigator.getBattery().then(batteryHandler)
@@ -43,3 +52,4 @@ function setButton() {
         }
     }
 })();
+
