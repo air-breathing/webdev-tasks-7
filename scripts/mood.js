@@ -15,23 +15,36 @@ function getHandler(recognizer) {
     idInterval = undefined;
     recognizer.onresult = function (event) {
         recognizer.stop();
-        clearInterval(idInterval);
-        action = actions.nothing;
+        if (idInterval != undefined) {
+            clearInterval(idInterval);
+            //текст выводим, если настроение не было прервано другим процессом
+            $('.speech__text').text(event.results[0][0].transcript);
+        }
         $('.piggy').on('click', getHandler(recognizer));
-        $('.speech__text').text(event.results[0][0].transcript);
+
     };
 
     return function handler() {
         $('.piggy').off('click');
-        if (action != actions.nothing) {
+        if (chargingEnergy || chargingSatiety) {
             return
         }
-        action = actions.communicate;
         if (idInterval != undefined) {
             return
         }
         idInterval = setInterval(function () {
+            if (chargingEnergy || chargingSatiety) {
+                clearInterval(idInterval);
+                idInterval = undefined;
+                chargingMood = false;
+                return;
+            }
             mood = (mood < 100)? mood + 1: mood;
+            chargingMood = true;
+            if (mood === 100) {
+                chargingMood = false;
+                //idInterval отключиться во время распознавания текста
+            }
         }, 1000);
         recognizer.start();
     }

@@ -1,0 +1,6 @@
+
+(function (){
+    global.dying = function () {
+
+    }
+})();

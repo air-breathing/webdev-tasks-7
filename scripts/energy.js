@@ -54,6 +54,7 @@
         if ('ondevicelight' in window) {
             $(window).on('devicelight', function (event) {
                 var value = event.value || 10000;
+                console.log('ondevicelight', value);
                 setGradient(value)
             })
         } else {
@@ -69,18 +70,10 @@ function setGradient(value) {
         wakeUp();
     }
     var gradient = svgPicture.select('#sky-gradient');
-    var darknessGradient = 'l(0, 0, 0, 1)#0c0e27-#075764';
-
-    var darkGradient = 'l(0, 0, 0, 1)#141843-#0b8ca1';
-
-    var normalGradient = 'l(0, 0, 0, 1)#232974-#88d3f0';
-
-    var lightGradient = 'l(0, 0, 0, 1)#88d3f0-#2ac1f0';
-
     if (value < 50) {
         gradient.animate({
             x1: 0,
-            y1: 0,
+            y1: 450,
             x2: 0,
             y2: 1000
         }, 10000)
@@ -116,24 +109,25 @@ function setGradient(value) {
 
 function fallAsleep() {
     chargingEnergy = true;
-    clearInterval(idIntervalBlink);
+    blinkFlag = false;
+    moodMask.trigger('changeMood', 60);
+    var eye = svgPicture.selectAll('.eyelide');
+    $(eye[0]).trigger('closeEye', function () {});
+    $(eye[1]).trigger('closeEye', function () {});
     idInterval2 = setInterval(function () {
         energy = (energy < 100)? energy + 1: energy;
+        if (energy === 100) {
+            wakeUp()
+        }
     }, 1000);
-    var eyes = svgPicture.selectAll('.eyelide');
     console.log('sleep');
-    $(eyes[0]).trigger('closeEye');
-    $(eyes[1]).trigger('closeEye');
+
 }
 
 function wakeUp() {
-    clearInterval(idInterval2);
     chargingEnergy = false;
-    var eyes = svgPicture.selectAll('.eyelide');
-    idIntervalBlink = setInterval(blinkFunciton, 10000);
-    setTimeout(function () {
-        $(eyes[0]).trigger('openEye');
-        $(eyes[1]).trigger('openEye');
-    }, 90000);
+    clearInterval(idInterval2);
+    blinkFlag = true;
     console.log('wake up');
+
 }

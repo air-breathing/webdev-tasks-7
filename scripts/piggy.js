@@ -3,7 +3,7 @@ require('./blink.js');
 require('./mood.js');
 require('./energy.js');
 require('./satiety.js');
-
+require('./die.js');
 //mood;
 //satiety;
 //energy;
@@ -13,23 +13,13 @@ chargingMood = false;
 chargingSatiety = false;
 chargingEnergy = false;
 
-var moodMask;
-var satietyMask;
-var energyMask;
+moodMask = null;
+satietyMask = null;
+energyMask = null;
 
 svgPicture = null;
 
 var dataAboutPast = getPiggyState();
-//var svgPicture;
-
-actions = {
-    'nothing': 0,
-    'communicate': 1,
-    'eat': 2,
-    'sleep': 3
-};
-
-action = actions['nothing'];
 
 
 function getPiggyState() {
@@ -142,9 +132,9 @@ function setButtonRestart() {
 
         localStorage.setItem('piggyState', JSON.stringify(dataAboutPast));
 
-        moodMask.trigger('increaseMood', [mood]);
-        satietyMask.trigger('increaseSatiety', [satiety]);
-        energyMask.trigger('increaseEnergy', [energy]);
+        moodMask.trigger('changeMood', [mood]);
+        satietyMask.trigger('changeSatiety', [satiety]);
+        energyMask.trigger('changeEnergy', [energy]);
     });
 }
 
@@ -160,28 +150,34 @@ function setPiggy() {
     energyMask = $(svgPicture.select('.energy'));
 
     var mouth = svgPicture.select('.mouth');
-    moodMask.on('increaseMood', function (event, number) {
-        repaint(this, number);
-        //при сне - отсутвствие улыбки или грусти
+    moodMask.on('changeMood', function (event, number) {
         if (chargingEnergy) {
             repaintMouth(mouth, 60);
         } else {
             repaintMouth(mouth, number);
+            repaint(this, number);
         }
 
+
     });
-    satietyMask.on('increaseSatiety', function (event, some) {
+    satietyMask.on('changeSatiety', function (event, some) {
         repaint(this, some);
     });
-    energyMask.on('increaseEnergy', function (event, some) {
+    energyMask.on('changeEnergy', function (event, some) {
         repaint(this, some);
     });
 
-    moodMask.trigger('increaseMood', [mood]);
-    satietyMask.trigger('increaseSatiety', [satiety]);
-    energyMask.trigger('increaseEnergy', [energy]);
+    moodMask.trigger('changeMood', [mood]);
+    satietyMask.trigger('changeSatiety', [satiety]);
+    energyMask.trigger('changeEnergy', [energy]);
 
     setInterval(function () {
+        if ((mood == 0 && satiety == 0) || (energy == 0 && satiety == 0) || (mood == 0 && energy == 0)) {
+            console.log('die');
+            return;
+        }
+
+        console.log(mood, satiety, energy);
         mood = ((!chargingMood) && (mood > 0))? mood - 1 : mood;
         satiety = (!chargingSatiety && satiety > 0)? satiety - 1 : satiety;
         energy = (!chargingEnergy && energy > 0)? energy - 1 : energy;
@@ -193,16 +189,13 @@ function setPiggy() {
         };
 
         localStorage.setItem('piggyState', JSON.stringify(dataAboutPast));
-
-        moodMask.trigger('increaseMood', [mood]);
-        satietyMask.trigger('increaseSatiety', [satiety]);
-        energyMask.trigger('increaseEnergy', [energy]);
-
-        if ((mood == 0 && satiety == 0) || (energy == 0 && satiety == 0) || (mood == 0 && energy == 0)) {
-            console.log('die');
-        }
-
     }, 9000);
+
+    setInterval(function () {
+        moodMask.trigger('changeMood', [mood]);
+        satietyMask.trigger('changeSatiety', [satiety]);
+        energyMask.trigger('changeEnergy', [energy]);
+    }, 2000)
 }
 
 
@@ -214,6 +207,8 @@ $(document).ready(function () {
     setBlink();
 
     setDreaming();
+
+    setEating();
 
     setSpeechRecognizer();
 
