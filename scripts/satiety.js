@@ -9,26 +9,37 @@ function batteryHandler (battery) {
     battery.onchargingchange = function () {
         if (battery.charging) {
             eat(undefined, battery)
+        } else {
+            chargingSatiety = false;
         }
     }
 }
 
 function eat(event, battery) {
-    if (satiety < 100 && !chargingEnergy) {
-        eatSong.dispatchEvent(eatEventEnable);
+    if (satiety < 100) {
+        //eatSong.dispatchEvent(eatEventEnable);
         idInterval3 = setInterval(
             function () {
-                if (chargingEnergy || (battery != undefined && battery.charging === false)) {
+                if (chargingEnergy) {
+                    eatSong.dispatchEvent(eatEventDisable);
+                    //clearInterval(idInterval3);
+                    return;
+                }
+                if ((battery != undefined && battery.charging === false)) {
                     eatSong.dispatchEvent(eatEventDisable);
                     clearInterval(idInterval3);
                     return;
                 }
                 satiety = (satiety < 100)? satiety + 1: satiety;
                 chargingSatiety = true;
+                //чтобы не было заедания песни
+                if (satiety < 95) {
+                    eatSong.dispatchEvent(eatEventEnable);
+                }
                 if (satiety === 100) {
                     eatSong.dispatchEvent(eatEventDisable);
                     chargingSatiety = false;
-                    clearInterval(idInterval3);
+                    //clearInterval(idInterval3);
                 }
             }, 1000);
     }
